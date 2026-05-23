@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: rate-limiter-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+rate-limiter:
+  enabled: true
+  algorithm: TOKEN_BUCKET
+  api-key:
+    limit: 100
+    window: 60s
+  ip:
+    limit: 100
+    window: 60s

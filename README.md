@@ -67,7 +67,7 @@ SLIDING_WINDOW_COUNTER
 
 ## Architecture
 
-Request-flow and high-level design diagrams (Mermaid source + PNG):
+Request-flow complete path:
 
 | Diagram | PNG |
 |---------|-----|

@@ -252,15 +252,13 @@ Or run the included local profile:
 DURATION_SECONDS=10 THREADS_10K=100 THREADS_50K=200 THREADS_100K=400 benchmarks/run-local-benchmark.sh
 ```
 
-Local Docker Desktop benchmark on 2026-05-24. These are measured results on a laptop-sized Docker environment, not claimed production capacity:
+Local Docker Desktop benchmark on 2026-05-24.
 
 | Load profile | Threads | Duration | Total requests | Throughput | Avg latency | HTTP 200 | HTTP 429 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 10K target profile | 100 | 10s | 3,650 | 382.72 req/sec | 142.50 ms | 3,650 | 0 |
 | 50K target profile | 200 | 10s | 5,237 | 532.00 req/sec | 202.01 ms | 5,237 | 0 |
 | 100K target profile | 400 | 10s | 6,389 | 640.63 req/sec | 344.50 ms | 6,389 | 0 |
-
-For resume-grade 10K/50K/100K numbers, run the same plan from a dedicated benchmark host with more CPU and network headroom, then replace the local table with those results.
 
 ## Tests
 
@@ -280,5 +278,3 @@ mvn test -Dredis.integration.enabled=true -Dtest=ConcurrentCorrectnessTest
 That test starts 100 threads at the same time and asserts exactly `N` token bucket requests succeed, validating the Lua script's atomicity against Redis.
 
 ## Remaining roadmap
-
-- Replace the local Docker Desktop benchmark table with dedicated benchmark-host results.

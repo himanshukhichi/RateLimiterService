@@ -279,14 +279,8 @@ That test starts 100 threads at the same time and asserts exactly `N` token buck
 
 ## Production roadmap
 
-- add local cache for dynamic rules with short TTL
 - add Redis timeout fallback policy
 - add admin auth
-- add Testcontainers
-- add Grafana dashboard
-- add CI
-- add load test results from real benchmark host
-- add per-route config model
 - add bulk admin APIs
 - add audit log for admin limit changes
 - add alert rules for rejection spikes and Redis latency

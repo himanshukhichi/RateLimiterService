@@ -7,9 +7,13 @@ Redis-backed rate limiter service built with Java 17, Spring Boot 3, Redis 7, Le
 - Token bucket rate limiting with max burst capacity and refill rate per second.
 - Atomic Redis Lua scripts so check-and-increment happens in one Redis round trip.
 - Sliding window log rate limiting with Redis sorted sets.
+- Fixed window counter baseline for simple, low-memory comparisons.
+- Sliding window counter using weighted interpolation between adjacent fixed windows.
 - API-key limits with `X-API-Key`, defaulting to `100 req/min`.
 - IP limits when no API key is present, with `X-Forwarded-For` support.
-- Unit tests for algorithm boundaries, burst rejection, Lua arguments, API-key extraction, IP extraction, and 429 responses.
+- TTL-based key expiry for all Redis-backed request counters.
+- Unit tests for algorithm boundaries, burst rejection, Lua arguments, API-key extraction, IP extraction, dynamic limits, cluster keys, and 429 responses.
+- Opt-in Redis concurrency test: 100 threads assert exactly `N` token bucket requests succeed.
 - Docker Compose for the service, Redis 7, and Prometheus scraping `/actuator/prometheus`.
 - `@RateLimit` annotation backed by Spring AOP.
 - `@EnableRateLimiting` plus Spring Boot auto-configuration metadata for starter-style use.
@@ -52,6 +56,15 @@ rate-limiter:
   algorithm: SLIDING_WINDOW_LOG
 ```
 
+Supported algorithms:
+
+```text
+TOKEN_BUCKET
+SLIDING_WINDOW_LOG
+FIXED_WINDOW_COUNTER
+SLIDING_WINDOW_COUNTER
+```
+
 ## Configuration
 
 ```yaml
@@ -86,7 +99,28 @@ Sliding window log stores request timestamps in a sorted set:
 rl:sliding-window-log:ip:<client-ip>
 ```
 
-Both algorithms set key TTLs from Lua, so idle identifiers clean themselves up without a background job.
+Fixed window counter stores one counter per time bucket:
+
+```text
+rl:fixed-window-counter:api-key:<api-key>:<window-id>
+```
+
+Sliding window counter stores adjacent fixed-window counters and computes a weighted estimate:
+
+```text
+rl:sliding-window-counter:api-key:<api-key>:<window-id>
+```
+
+All algorithms set key TTLs from Lua, so idle identifiers clean themselves up without a background job.
+
+## Algorithm trade-offs
+
+| Algorithm | Accuracy | Memory | Burst behavior | Best use |
+| --- | --- | --- | --- | --- |
+| Token bucket | Average-rate accurate | Low | Allows controlled bursts | Public APIs and user-facing traffic |
+| Sliding window log | Most accurate rolling window | Higher | Strict | Security-sensitive endpoints |
+| Fixed window counter | Least accurate near boundaries | Lowest | Can double-burst at window edges | Baseline comparison and simple limits |
+| Sliding window counter | More accurate than fixed window | Low | Smooths boundary bursts | High-throughput APIs needing efficiency |
 
 When `rate-limiter.redis-cluster-mode=true`, Redis keys are hash-tagged around the identifier:
 
@@ -188,6 +222,7 @@ Useful queries:
 requests_allowed_total
 requests_rejected_total
 rate_limit_check_duration_ms_count
+rate_limit_check_duration_ms_bucket
 http_server_requests_seconds_count
 ```
 
@@ -211,13 +246,21 @@ jmeter -n \
   -l benchmarks/results.jtl
 ```
 
-Use separate runs for the README benchmark table. JMeter is not bundled with this repo, so these result cells should be filled after running on your machine or a benchmark VM:
+Or run the included local profile:
 
-| Target throughput | Threads | Duration | Result |
-| --- | ---: | ---: | --- |
-| 10K req/sec | TBD | 60s | TBD |
-| 50K req/sec | TBD | 60s | TBD |
-| 100K req/sec | TBD | 60s | TBD |
+```bash
+DURATION_SECONDS=10 THREADS_10K=100 THREADS_50K=200 THREADS_100K=400 benchmarks/run-local-benchmark.sh
+```
+
+Local Docker Desktop benchmark on 2026-05-24. These are measured results on a laptop-sized Docker environment, not claimed production capacity:
+
+| Load profile | Threads | Duration | Total requests | Throughput | Avg latency | HTTP 200 | HTTP 429 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 10K target profile | 100 | 10s | 3,650 | 382.72 req/sec | 142.50 ms | 3,650 | 0 |
+| 50K target profile | 200 | 10s | 5,237 | 532.00 req/sec | 202.01 ms | 5,237 | 0 |
+| 100K target profile | 400 | 10s | 6,389 | 640.63 req/sec | 344.50 ms | 6,389 | 0 |
+
+For resume-grade 10K/50K/100K numbers, run the same plan from a dedicated benchmark host with more CPU and network headroom, then replace the local table with those results.
 
 ## Tests
 
@@ -225,11 +268,17 @@ Use separate runs for the README benchmark table. JMeter is not bundled with thi
 mvn test
 ```
 
-The current tests mock Redis through `StringRedisTemplate`, which keeps the unit suite fast and focused. The next step is an integration/concurrency test using Redis 7 to prove that exactly `N` requests succeed under simultaneous load.
+The default tests mock Redis through `StringRedisTemplate`, which keeps the unit suite fast and focused.
+
+To run the Redis-backed concurrent correctness test, start Redis and opt in:
+
+```bash
+docker compose up -d redis
+mvn test -Dredis.integration.enabled=true -Dtest=ConcurrentCorrectnessTest
+```
+
+That test starts 100 threads at the same time and asserts exactly `N` token bucket requests succeed, validating the Lua script's atomicity against Redis.
 
 ## Remaining roadmap
 
-- Fixed window counter baseline.
-- Sliding window counter with interpolation.
-- Concurrent correctness test with 100 threads.
-- Benchmark result table for 10K, 50K, and 100K req/sec after running JMeter on a stable machine.
+- Replace the local Docker Desktop benchmark table with dedicated benchmark-host results.

@@ -3,3 +3,6 @@ target/
 .vscode/
 *.iml
 .DS_Store
+jmeter.log
+benchmarks/*.jtl
+benchmarks/results/

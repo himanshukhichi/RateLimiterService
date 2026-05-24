@@ -28,8 +28,7 @@ public class RateLimitMetrics {
 
         DistributionSummary.builder("rate_limit_check_duration_ms")
                 .description("Time spent checking a rate limit")
-                .baseUnit("milliseconds")
-                .publishPercentileHistogram()
+                .serviceLevelObjectives(1, 5, 10, 25, 50, 100)
                 .tag("algorithm", algorithm)
                 .tag("identifier_type", identifierType)
                 .register(meterRegistry)

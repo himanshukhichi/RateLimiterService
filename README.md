@@ -73,7 +73,6 @@ Request-flow and high-level design diagrams (Mermaid source + PNG):
 |---------|-----|
 | Request flow (filter path) | [`docs/request-flow.png`](docs/request-flow.png) |
 
-```
 
 ## Configuration
 

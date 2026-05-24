@@ -277,7 +277,7 @@ mvn test -Dredis.integration.enabled=true -Dtest=ConcurrentCorrectnessTest
 
 That test starts 100 threads at the same time and asserts exactly `N` token bucket requests succeed, validating the Lua script's atomicity against Redis.
 
-## Remaining roadmap
+## Production roadmap
 
 - add local cache for dynamic rules with short TTL
 - add Redis timeout fallback policy

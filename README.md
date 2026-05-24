@@ -65,6 +65,16 @@ FIXED_WINDOW_COUNTER
 SLIDING_WINDOW_COUNTER
 ```
 
+## Architecture
+
+Request-flow and high-level design diagrams (Mermaid source + PNG):
+
+| Diagram | PNG |
+|---------|-----|
+| Request flow (filter path) | [`docs/request-flow.png`](docs/request-flow.png) |
+
+```
+
 ## Configuration
 
 ```yaml

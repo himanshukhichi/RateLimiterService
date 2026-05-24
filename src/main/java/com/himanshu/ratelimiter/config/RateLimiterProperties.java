@@ -13,6 +13,8 @@ import java.time.Duration;
 public class RateLimiterProperties {
 
     private boolean enabled = true;
+    private boolean filterEnabled = true;
+    private boolean redisClusterMode = false;
     private RateLimitAlgorithm algorithm = RateLimitAlgorithm.TOKEN_BUCKET;
     @Valid
     private Limit apiKey = new Limit();
@@ -25,6 +27,22 @@ public class RateLimiterProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isFilterEnabled() {
+        return filterEnabled;
+    }
+
+    public void setFilterEnabled(boolean filterEnabled) {
+        this.filterEnabled = filterEnabled;
+    }
+
+    public boolean isRedisClusterMode() {
+        return redisClusterMode;
+    }
+
+    public void setRedisClusterMode(boolean redisClusterMode) {
+        this.redisClusterMode = redisClusterMode;
     }
 
     public RateLimitAlgorithm getAlgorithm() {

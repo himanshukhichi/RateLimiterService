@@ -9,8 +9,11 @@ public record RateLimitDecision(
         long remaining,
         Instant resetAt,
         Duration retryAfter,
+        Duration window,
         RateLimitAlgorithm algorithm,
         IdentifierType identifierType,
-        String identifier
+        String identifier,
+        String method,
+        String endpoint
 ) {
 }

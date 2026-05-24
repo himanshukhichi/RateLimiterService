@@ -2,7 +2,8 @@ package com.himanshu.ratelimiter.algorithm;
 
 public enum IdentifierType {
     API_KEY("api-key"),
-    IP("ip");
+    IP("ip"),
+    USER_ID("user-id");
 
     private final String keyPrefix;
 

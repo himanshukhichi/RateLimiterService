@@ -57,9 +57,12 @@ public class TokenBucketRateLimiter implements RateLimiter {
                 remaining,
                 resetAt,
                 retryAfter,
+                request.window(),
                 algorithm(),
                 request.identifierType(),
-                request.identifier()
+                request.identifier(),
+                request.method(),
+                request.endpoint()
         );
     }
 

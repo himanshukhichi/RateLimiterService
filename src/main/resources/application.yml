@@ -27,6 +27,8 @@ management:
 
 rate-limiter:
   enabled: true
+  filter-enabled: true
+  redis-cluster-mode: false
   algorithm: TOKEN_BUCKET
   api-key:
     limit: 100

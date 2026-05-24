@@ -11,6 +11,8 @@ public record RateLimitRequest(
         Duration window,
         int tokenBucketCapacity,
         double tokenBucketRefillRatePerSecond,
-        Instant now
+        Instant now,
+        String method,
+        String endpoint
 ) {
 }

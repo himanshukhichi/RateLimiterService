@@ -1,5 +1,6 @@
 package com.himanshu.ratelimiter.algorithm;
 
+import com.himanshu.ratelimiter.config.RateLimiterProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ class SlidingWindowLogRateLimiterTest {
 
     @BeforeEach
     void setUp() {
-        limiter = new SlidingWindowLogRateLimiter(redisTemplate, new RateLimiterKeyFactory());
+        limiter = new SlidingWindowLogRateLimiter(redisTemplate, new RateLimiterKeyFactory(new RateLimiterProperties()));
     }
 
     @Test
@@ -84,7 +85,9 @@ class SlidingWindowLogRateLimiterTest {
                 Duration.ofMinutes(1),
                 limit,
                 1.6667,
-                now
+                now,
+                null,
+                null
         );
     }
 }

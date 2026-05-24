@@ -1,5 +1,6 @@
 package com.himanshu.ratelimiter.algorithm;
 
+import com.himanshu.ratelimiter.config.RateLimiterProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ class TokenBucketRateLimiterTest {
 
     @BeforeEach
     void setUp() {
-        limiter = new TokenBucketRateLimiter(redisTemplate, new RateLimiterKeyFactory());
+        limiter = new TokenBucketRateLimiter(redisTemplate, new RateLimiterKeyFactory(new RateLimiterProperties()));
     }
 
     @Test
@@ -87,7 +88,9 @@ class TokenBucketRateLimiterTest {
                 Duration.ofMinutes(1),
                 capacity,
                 refillRatePerSecond,
-                now
+                now,
+                null,
+                null
         );
     }
 }

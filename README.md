@@ -1,4 +1,4 @@
-# RateLimiterService
+# Rate Limiter Service
 
 Redis-backed rate limiter service built with Java 17, Spring Boot 3, Redis 7, Lettuce, Lua scripts, Docker Compose, Prometheus, JUnit 5, and Mockito.
 
